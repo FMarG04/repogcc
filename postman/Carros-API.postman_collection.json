@@ -1,0 +1,119 @@
+{
+  "info": {
+    "name": "Carros API - Presentacion",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - GET listar carros",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/carros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Respuesta 200', () => pm.response.to.have.status(200));",
+              "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array')); "
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - POST registrar carro",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 2024,\n  \"color\": \"Blanco\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/carros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Respuesta 201', () => pm.response.to.have.status(201));",
+              "pm.test('Carro registrado', () => { const c = pm.response.json(); pm.expect(c.id).to.be.a('number'); pm.expect(c.marca).to.eql('Toyota'); pm.expect(c.modelo).to.eql('Corolla'); pm.expect(c.anio).to.eql(2024); pm.expect(c.color).to.eql('Blanco'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - GET comprobar registro",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/carros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Respuesta 200', () => pm.response.to.have.status(200));",
+              "pm.test('Contiene el Toyota registrado', () => pm.expect(pm.response.json().some(c => c.marca === 'Toyota' && c.modelo === 'Corolla' && c.anio === 2024 && c.color === 'Blanco')).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - POST datos incompletos (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"marca\":\"Toyota\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/carros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Rechaza datos incompletos', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
