@@ -31,4 +31,27 @@ public class CarroController {
         carros.put(id, carro);
         return carro;
     }
+
+    // PUT: reemplaza los cuatro datos del carro sin cambiar su id.
+    @PutMapping("/{id}")
+    public Carro actualizar(@PathVariable Long id, @Valid @RequestBody CarroRequest datos) {
+        Carro actualizado = carros.computeIfPresent(id, (clave, anterior) ->
+            new Carro(clave, datos.marca().trim(), datos.modelo().trim(),
+                datos.anio(), datos.color().trim()));
+        if (actualizado == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                HttpStatus.NOT_FOUND, "No existe el carro con id " + id);
+        }
+        return actualizado;
+    }
+
+    // DELETE: elimina el carro indicado; 204 significa exito sin cuerpo.
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id) {
+        if (carros.remove(id) == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                HttpStatus.NOT_FOUND, "No existe el carro con id " + id);
+        }
+    }
 }

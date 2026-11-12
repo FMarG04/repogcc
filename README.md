@@ -61,3 +61,16 @@ Esta aplicacion REST registra carros. Fue ejecutada desde GitHub Codespaces usan
 - 400: enviar los cuatro campos y anio como numero.
 - 415: seleccionar Body > raw > JSON y Content-Type application/json.
 - No responde: comprobar que Codespaces y mvn spring-boot:run siguen activos.
+
+## CRUD completo: actualizar y eliminar
+
+Coleccion: Carros API - CRUD completo. Ejecutar las peticiones 1 a 7 en orden. POST guarda el id automaticamente en carroId.
+
+| Metodo | Ruta | Resultado |
+|---|---|---|
+| PUT | /api/carros/{id} | 200 OK y carro actualizado |
+| DELETE | /api/carros/{id} | 204 No Content, sin cuerpo |
+
+PUT requiere marca, modelo, anio y color; conserva el id. Ambos devuelven 404 si el carro no existe. PUT con datos invalidos devuelve 400 sin modificar el registro.
+
+Para exponer: GET consulta; POST crea; PUT actualiza; DELETE elimina. Consultar con GET despues de PUT y DELETE para comprobar los cambios.

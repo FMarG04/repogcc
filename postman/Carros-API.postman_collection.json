@@ -1,12 +1,16 @@
 {
   "info": {
-    "name": "Carros API - Presentacion",
+    "name": "Carros API - CRUD completo",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080"
+      "value": "https://bookish-broccoli-5gpwjx57g4w24qj9-8080.app.github.dev"
+    },
+    {
+      "key": "carroId",
+      "value": ""
     }
   ],
   "item": [
@@ -57,7 +61,8 @@
             "type": "text/javascript",
             "exec": [
               "pm.test('Respuesta 201', () => pm.response.to.have.status(201));",
-              "pm.test('Carro registrado', () => { const c = pm.response.json(); pm.expect(c.id).to.be.a('number'); pm.expect(c.marca).to.eql('Toyota'); pm.expect(c.modelo).to.eql('Corolla'); pm.expect(c.anio).to.eql(2024); pm.expect(c.color).to.eql('Blanco'); });"
+              "pm.test('Carro registrado', () => { const c = pm.response.json(); pm.expect(c.id).to.be.a('number'); pm.expect(c.marca).to.eql('Toyota'); pm.expect(c.modelo).to.eql('Corolla'); pm.expect(c.anio).to.eql(2024); pm.expect(c.color).to.eql('Blanco'); });",
+              "if (pm.response.code === 201) pm.collectionVariables.set('carroId', pm.response.json().id);"
             ]
           }
         }
@@ -83,7 +88,149 @@
       ]
     },
     {
-      "name": "4 - POST datos incompletos (400)",
+      "name": "4 - PUT actualizar carro",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/carros/{{carroId}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"marca\": \"Honda\",\n  \"modelo\": \"Civic\",\n  \"anio\": 2025,\n  \"color\": \"Negro\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Actualizado: 200', () => pm.response.to.have.status(200));",
+              "pm.test('Conserva ID y actualiza datos', () => { const c=pm.response.json(); pm.expect(String(c.id)).to.eql(String(pm.collectionVariables.get('carroId'))); pm.expect(c.marca).to.eql('Honda'); pm.expect(c.modelo).to.eql('Civic'); pm.expect(c.anio).to.eql(2025); pm.expect(c.color).to.eql('Negro'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - GET comprobar actualizacion",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/carros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Consulta: 200', () => pm.response.to.have.status(200));",
+              "pm.test('Contiene el carro actualizado', () => { const c=pm.response.json().find(c=>String(c.id)===String(pm.collectionVariables.get('carroId'))); pm.expect(c).to.include({marca:'Honda',modelo:'Civic',anio:2025,color:'Negro'}); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 - DELETE eliminar carro",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/carros/{{carroId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Eliminado: 204', () => pm.response.to.have.status(204));",
+              "pm.test('Sin cuerpo', () => pm.expect(pm.response.text()).to.eql(''));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 - GET comprobar eliminacion",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/carros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Consulta: 200', () => pm.response.to.have.status(200));",
+              "pm.test('El carro ya no existe', () => pm.expect(pm.response.json().some(c=>String(c.id)===String(pm.collectionVariables.get('carroId')))).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 - PUT inexistente (404)",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/carros/999999",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"marca\": \"Honda\",\n  \"modelo\": \"Civic\",\n  \"anio\": 2025,\n  \"color\": \"Negro\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('No existe: 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9 - DELETE inexistente (404)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/carros/999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('No existe: 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - POST datos incompletos (400)",
       "request": {
         "method": "POST",
         "header": [
