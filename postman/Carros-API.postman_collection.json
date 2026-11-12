@@ -1,7 +1,8 @@
 {
   "info": {
-    "name": "Carros API - CRUD completo",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "name": "Carros API - Lista para presentar",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API REST de carros con Spring Boot, ejecutada en GitHub Codespaces. Para demostrar CRUD: ejecutar solicitudes 1 a 7 en orden. 8 a 10 muestran errores controlados. POST captura el id automaticamente en carroId. Los ejemplos guardados son respuestas reales capturadas dentro de Codespaces; las peticiones en vivo requieren acceso al puerto 8080."
   },
   "variable": [
     {
@@ -18,7 +19,8 @@
       "name": "1 - GET listar carros",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/carros"
+        "url": "{{baseUrl}}/api/carros",
+        "description": "Consulta inicial: muestra los carros registrados."
       },
       "event": [
         {
@@ -30,6 +32,39 @@
               "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array')); "
             ]
           }
+        }
+      ],
+      "response": [
+        {
+          "name": "200 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/carros",
+            "description": "Consulta inicial: muestra los carros registrados."
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "[]"
         }
       ]
     },
@@ -52,7 +87,8 @@
             }
           }
         },
-        "url": "{{baseUrl}}/api/carros"
+        "url": "{{baseUrl}}/api/carros",
+        "description": "Crea Toyota Corolla, anio 2024, color Blanco. Guarda automaticamente su id en carroId."
       },
       "event": [
         {
@@ -66,13 +102,62 @@
             ]
           }
         }
+      ],
+      "response": [
+        {
+          "name": "201 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 2024,\n  \"color\": \"Blanco\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/carros",
+            "description": "Crea Toyota Corolla, anio 2024, color Blanco. Guarda automaticamente su id en carroId."
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"id\": 2,\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 2024,\n  \"color\": \"Blanco\"\n}"
+        }
       ]
     },
     {
       "name": "3 - GET comprobar registro",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/carros"
+        "url": "{{baseUrl}}/api/carros",
+        "description": "Consulta para mostrar el carro creado."
       },
       "event": [
         {
@@ -84,6 +169,39 @@
               "pm.test('Contiene el Toyota registrado', () => pm.expect(pm.response.json().some(c => c.marca === 'Toyota' && c.modelo === 'Corolla' && c.anio === 2024 && c.color === 'Blanco')).to.eql(true));"
             ]
           }
+        }
+      ],
+      "response": [
+        {
+          "name": "200 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/carros",
+            "description": "Consulta para mostrar el carro creado."
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n  {\n    \"id\": 2,\n    \"marca\": \"Toyota\",\n    \"modelo\": \"Corolla\",\n    \"anio\": 2024,\n    \"color\": \"Blanco\"\n  }\n]"
         }
       ]
     },
@@ -106,7 +224,8 @@
               "language": "json"
             }
           }
-        }
+        },
+        "description": "Actualiza los cuatro datos del mismo carro a Honda Civic, anio 2025, color Negro. Conserva su id."
       },
       "event": [
         {
@@ -119,13 +238,62 @@
             ]
           }
         }
+      ],
+      "response": [
+        {
+          "name": "200 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/carros/2",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marca\": \"Honda\",\n  \"modelo\": \"Civic\",\n  \"anio\": 2025,\n  \"color\": \"Negro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Actualiza los cuatro datos del mismo carro a Honda Civic, anio 2025, color Negro. Conserva su id."
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"id\": 2,\n  \"marca\": \"Honda\",\n  \"modelo\": \"Civic\",\n  \"anio\": 2025,\n  \"color\": \"Negro\"\n}"
+        }
       ]
     },
     {
       "name": "5 - GET comprobar actualizacion",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/carros"
+        "url": "{{baseUrl}}/api/carros",
+        "description": "Consulta para mostrar los datos actualizados."
       },
       "event": [
         {
@@ -138,13 +306,47 @@
             ]
           }
         }
+      ],
+      "response": [
+        {
+          "name": "200 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/carros",
+            "description": "Consulta para mostrar los datos actualizados."
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n  {\n    \"id\": 2,\n    \"marca\": \"Honda\",\n    \"modelo\": \"Civic\",\n    \"anio\": 2025,\n    \"color\": \"Negro\"\n  }\n]"
+        }
       ]
     },
     {
       "name": "6 - DELETE eliminar carro",
       "request": {
         "method": "DELETE",
-        "url": "{{baseUrl}}/api/carros/{{carroId}}"
+        "url": "{{baseUrl}}/api/carros/{{carroId}}",
+        "description": "Elimina solamente el carro creado por el POST de esta secuencia. 204 no tiene cuerpo."
       },
       "event": [
         {
@@ -157,13 +359,39 @@
             ]
           }
         }
+      ],
+      "response": [
+        {
+          "name": "204 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/carros/2",
+            "description": "Elimina solamente el carro creado por el POST de esta secuencia. 204 no tiene cuerpo."
+          },
+          "status": "No Content",
+          "code": 204,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": ""
+        }
       ]
     },
     {
       "name": "7 - GET comprobar eliminacion",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/carros"
+        "url": "{{baseUrl}}/api/carros",
+        "description": "Consulta para comprobar que el carro eliminado ya no aparece."
       },
       "event": [
         {
@@ -175,6 +403,39 @@
               "pm.test('El carro ya no existe', () => pm.expect(pm.response.json().some(c=>String(c.id)===String(pm.collectionVariables.get('carroId')))).to.eql(false));"
             ]
           }
+        }
+      ],
+      "response": [
+        {
+          "name": "200 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/carros",
+            "description": "Consulta para comprobar que el carro eliminado ya no aparece."
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "[]"
         }
       ]
     },
@@ -197,7 +458,8 @@
               "language": "json"
             }
           }
-        }
+        },
+        "description": "Demuestra 404 al actualizar un id inexistente."
       },
       "event": [
         {
@@ -208,6 +470,54 @@
               "pm.test('No existe: 404', () => pm.response.to.have.status(404));"
             ]
           }
+        }
+      ],
+      "response": [
+        {
+          "name": "404 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/carros/999999",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marca\": \"Honda\",\n  \"modelo\": \"Civic\",\n  \"anio\": 2025,\n  \"color\": \"Negro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Demuestra 404 al actualizar un id inexistente."
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"timestamp\": \"2026-11-12T17:21:34.473+00:00\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"path\": \"/api/carros/999999\"\n}"
         }
       ]
     },
@@ -215,7 +525,8 @@
       "name": "9 - DELETE inexistente (404)",
       "request": {
         "method": "DELETE",
-        "url": "{{baseUrl}}/api/carros/999999"
+        "url": "{{baseUrl}}/api/carros/999999",
+        "description": "Demuestra 404 al eliminar un id inexistente."
       },
       "event": [
         {
@@ -226,6 +537,39 @@
               "pm.test('No existe: 404', () => pm.response.to.have.status(404));"
             ]
           }
+        }
+      ],
+      "response": [
+        {
+          "name": "404 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/carros/999999",
+            "description": "Demuestra 404 al eliminar un id inexistente."
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"timestamp\": \"2026-11-12T17:21:34.477+00:00\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"path\": \"/api/carros/999999\"\n}"
         }
       ]
     },
@@ -248,7 +592,8 @@
             }
           }
         },
-        "url": "{{baseUrl}}/api/carros"
+        "url": "{{baseUrl}}/api/carros",
+        "description": "Demuestra 400 al registrar un carro sin los cuatro datos requeridos."
       },
       "event": [
         {
@@ -259,6 +604,54 @@
               "pm.test('Rechaza datos incompletos', () => pm.response.to.have.status(400));"
             ]
           }
+        }
+      ],
+      "response": [
+        {
+          "name": "400 - Respuesta real desde Codespaces",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"marca\":\"Toyota\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/carros",
+            "description": "Demuestra 400 al registrar un carro sin los cuatro datos requeridos."
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 12 Nov 2026 17:21:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"mensaje\": \"Revisa los datos del carro\",\n  \"errores\": {\n    \"anio\": \"El anio es obligatorio\",\n    \"color\": \"El color es obligatorio\",\n    \"modelo\": \"El modelo es obligatorio\"\n  }\n}"
         }
       ]
     }
