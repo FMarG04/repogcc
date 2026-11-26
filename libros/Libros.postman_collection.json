@@ -1,0 +1,72 @@
+{
+  "info": {
+    "name": "Libros | Spring Boot y Neon",
+    "description": "Ejecuta Registrar libro y después Listar libros. baseUrl apunta a Spring Boot en el puerto 8081.",
+    "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Registrar libro",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/libros",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"El principito\",\n  \"autor\": \"Antoine de Saint-Exupéry\",\n  \"isbn\": \"9780156012195\"\n}",
+          "options": { "raw": { "language": "json" } }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.unset('libroId');",
+              "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) {",
+              "  const libro = pm.response.json();",
+              "  pm.test('Devuelve un ID autogenerado', () => {",
+              "    pm.expect(libro.id).to.be.a('number').and.to.be.above(0);",
+              "    pm.collectionVariables.set('libroId', String(libro.id));",
+              "  });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Listar libros",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/libros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) {",
+              "  const libros = pm.response.json();",
+              "  pm.test('Devuelve una lista', () => pm.expect(libros).to.be.an('array'));",
+              "  const id = pm.collectionVariables.get('libroId');",
+              "  if (id) {",
+              "    pm.test('Incluye el libro registrado', () => {",
+              "      pm.expect(libros.some(libro => String(libro.id) === id)).to.equal(true);",
+              "    });",
+              "  }",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
