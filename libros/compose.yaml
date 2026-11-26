@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: biblioteca
+      POSTGRES_USER: libros
+      POSTGRES_PASSWORD: ${LIBROS_DB_PASSWORD:-libros_dev}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "libros", "-d", "biblioteca"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  datos:
