@@ -36,10 +36,10 @@ Con el Codespace activo y Spring Boot en ejecución, abre la aplicación web. Ag
 | Editar | `PUT /api/consolas/{id}` | `200` y la consola actualizada |
 | Eliminar | `DELETE /api/consolas/{id}` | `204` |
 
-`Index.html` contiene el formulario y la tabla. `Code.gs` hace las peticiones con `UrlFetchApp` y envía la clave en la cabecera `X-API-Key`. En Java, `Consola` es el modelo, `ConsolaController` recibe las peticiones y `ConsolaService` ejecuta el SQL.
+`Index.html` contiene el formulario y la tabla. `Code.gs` hace las peticiones con `UrlFetchApp` y envía la clave en la cabecera `X-API-Key`. `ConsolaController.java` reúne las cuatro rutas REST y ejecuta el SQL con `JdbcClient`. En ese mismo archivo, `Datos` valida lo que envía el formulario y `Consola` describe la respuesta con el ID generado por PostgreSQL.
 
 ## Reactivar el precio
 
-Busca `PRECIO OPCIONAL` en `Consola.java`, `ConsolaController.java`, `ConsolaService.java`, `schema.sql` e `Index.html`. En cada línea, descomenta el fragmento de código. Quita el primer `//` en Java y JavaScript, el primer `--` en SQL o el primer par `<!--` y `-->` en HTML. Puedes dejar la etiqueta del final como referencia.
+Busca `PRECIO OPCIONAL` en `ConsolaController.java`, `schema.sql` e `Index.html`. En cada línea, descomenta el fragmento de código. Quita el primer `//` en Java y JavaScript, el primer `--` en SQL o el primer par `<!--` y `-->` en HTML. Puedes dejar la etiqueta del final como referencia.
 
 Reinicia Spring Boot para que ejecute el SQL y actualiza `Index.html` en Apps Script. Si la página ya estaba publicada, edita la implementación para usar una versión nueva. Las consolas que se crearon sin precio se pueden completar desde el formulario.
