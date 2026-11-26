@@ -1,6 +1,6 @@
 # CRUD de consolas
 
-La página de Google Apps Script llama a Spring Boot por HTTPS. Spring Boot utiliza su `DataSource` para guardar las consolas en PostgreSQL. La tabla tiene `marca`, `modelo`, `precio` e `id`. PostgreSQL genera el ID y guarda el precio como decimal de hasta dos cifras fraccionarias.
+La página de Google Apps Script llama a Spring Boot por HTTPS. Spring Boot utiliza su `DataSource` para guardar las consolas en PostgreSQL. El CRUD usa `id`, `marca` y `modelo`. PostgreSQL genera el ID al registrar una consola.
 
 ## 1. Arranca Spring Boot en Codespaces
 
@@ -27,7 +27,7 @@ Con la API en marcha, abre **Ports** en Codespaces, reenvía el puerto `8082`, c
 
 ## 3. Prueba el CRUD
 
-Con el Codespace activo y Spring Boot en ejecución, abre la aplicación web. Agrega una consola con marca `Nintendo`, modelo `Switch OLED` y precio `1299.90`. Comprueba que aparece en el listado, edita su precio y luego elimínala.
+Con el Codespace activo y Spring Boot en ejecución, abre la aplicación web. Agrega una consola con marca `Nintendo` y modelo `Switch OLED`. Comprueba que aparece con su ID, edita el modelo y luego elimina la consola.
 
 | Acción | Método y ruta | Respuesta |
 | --- | --- | --- |
@@ -37,3 +37,9 @@ Con el Codespace activo y Spring Boot en ejecución, abre la aplicación web. Ag
 | Eliminar | `DELETE /api/consolas/{id}` | `204` |
 
 `Index.html` contiene el formulario y la tabla. `Code.gs` hace las peticiones con `UrlFetchApp` y envía la clave en la cabecera `X-API-Key`. En Java, `Consola` es el modelo, `ConsolaController` recibe las peticiones y `ConsolaService` ejecuta el SQL.
+
+## Reactivar el precio
+
+Busca `PRECIO OPCIONAL` en `Consola.java`, `ConsolaController.java`, `ConsolaService.java`, `schema.sql` e `Index.html`. En cada línea, descomenta el fragmento de código. Quita el primer `//` en Java y JavaScript, el primer `--` en SQL o el primer par `<!--` y `-->` en HTML. Puedes dejar la etiqueta del final como referencia.
+
+Reinicia Spring Boot para que ejecute el SQL y actualiza `Index.html` en Apps Script. Si la página ya estaba publicada, edita la implementación para usar una versión nueva. Las consolas que se crearon sin precio se pueden completar desde el formulario.

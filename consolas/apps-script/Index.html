@@ -33,7 +33,7 @@
         <div class="campos">
           <label>Marca <input id="marca" required maxlength="80"></label>
           <label>Modelo <input id="modelo" required maxlength="80"></label>
-          <label>Precio <input id="precio" required type="number" min="0" max="9999999999.99" step="0.01"></label>
+          <!-- <label>Precio <input id="precio" required type="number" min="0" max="9999999999.99" step="0.01"></label> --> <!-- PRECIO OPCIONAL -->
         </div>
         <div class="acciones">
           <button id="guardar" type="submit">Agregar</button>
@@ -46,7 +46,15 @@
       <h2 id="titulo-listado">Consolas registradas</h2>
       <div class="tabla">
         <table>
-          <thead><tr><th scope="col">Marca</th><th scope="col">Modelo</th><th scope="col">Precio</th><th scope="col">Acciones</th></tr></thead>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Marca</th>
+              <th scope="col">Modelo</th>
+              <!-- <th scope="col">Precio</th> --> <!-- PRECIO OPCIONAL -->
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
           <tbody id="filas"></tbody>
         </table>
       </div>
@@ -57,14 +65,10 @@
     const tituloFormulario = document.getElementById('titulo-formulario');
     const marca = document.getElementById('marca');
     const modelo = document.getElementById('modelo');
-    const precio = document.getElementById('precio');
     const guardar = document.getElementById('guardar');
     const cancelar = document.getElementById('cancelar');
     const estado = document.getElementById('estado');
     const filas = document.getElementById('filas');
-    const formatoPrecio = new Intl.NumberFormat('es-PE', {
-      minimumFractionDigits: 2, maximumFractionDigits: 2
-    });
     let editando = null;
     let ocupado = false;
 
@@ -99,12 +103,14 @@
       filas.replaceChildren();
       if (!consolas.length) {
         const celda = filas.insertRow().insertCell();
-        celda.colSpan = 4;
+        celda.colSpan = document.querySelector('thead tr').cells.length;
         celda.textContent = 'Todavía no hay consolas.';
       }
       for (const consola of consolas) {
         const fila = filas.insertRow();
-        for (const valor of [consola.marca, consola.modelo, formatoPrecio.format(consola.precio)]) {
+        const valores = [consola.id, consola.marca, consola.modelo];
+        // valores.push(consola.precio == null ? 'Sin precio' : formatoPrecio.format(consola.precio)); // PRECIO OPCIONAL
+        for (const valor of valores) {
           fila.insertCell().textContent = valor;
         }
         const acciones = fila.insertCell();
@@ -127,7 +133,7 @@
       editando = consola.id;
       marca.value = consola.marca;
       modelo.value = consola.modelo;
-      precio.value = consola.precio;
+      // precio.value = consola.precio ?? ''; // PRECIO OPCIONAL
       tituloFormulario.textContent = 'Editar consola';
       guardar.textContent = 'Guardar cambios';
       cancelar.hidden = false;
@@ -154,11 +160,12 @@
 
     formulario.addEventListener('submit', (evento) => {
       evento.preventDefault();
-      const datos = { marca: marca.value.trim(), modelo: modelo.value.trim(), precio: precio.valueAsNumber };
-      if (!datos.marca || !datos.modelo || !Number.isFinite(datos.precio)) {
-        estado.textContent = 'Completa la marca, el modelo y el precio.';
+      const datos = { marca: marca.value.trim(), modelo: modelo.value.trim() };
+      if (!datos.marca || !datos.modelo) {
+        estado.textContent = 'Completa la marca y el modelo.';
         return;
       }
+      // datos.precio = precio.valueAsNumber; // PRECIO OPCIONAL
       ejecutar(async () => {
         const id = editando;
         if (id === null) await invocar('crearConsola', datos);
@@ -169,6 +176,10 @@
       });
     });
     cancelar.addEventListener('click', limpiarFormulario);
+
+    // const precio = document.getElementById('precio'); // PRECIO OPCIONAL
+    // const formatoPrecio = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); // PRECIO OPCIONAL
+
     ejecutar(async () => {
       await cargar();
       return '';

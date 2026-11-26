@@ -45,7 +45,7 @@ function pedir_(method, ruta = '', datos) {
   }
   const respuesta = UrlFetchApp.fetch(base.replace(/\/+$/, '') + '/api/consolas' + ruta, opciones);
   const estado = respuesta.getResponseCode();
-  if (estado === 400) throw new Error('Revisa la marca, el modelo y el precio.');
+  if (estado === 400) throw new Error('Revisa los campos del formulario.');
   if (estado === 401) throw new Error('La API rechazó el acceso. Revisa la clave y el puerto de Codespaces.');
   if (estado === 404) throw new Error('No se encontró la consola o la ruta de la API.');
   if (estado < 200 || estado >= 300) {

@@ -3,12 +3,12 @@ package com.eternal.consolas.controller;
 import com.eternal.consolas.model.Consola;
 import com.eternal.consolas.service.ConsolaService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
+// import jakarta.validation.constraints.Digits; // PRECIO OPCIONAL
+// import jakarta.validation.constraints.NotNull; // PRECIO OPCIONAL
+// import jakarta.validation.constraints.PositiveOrZero; // PRECIO OPCIONAL
+// import java.math.BigDecimal; // PRECIO OPCIONAL
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +32,18 @@ public class ConsolaController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Consola crear(@Valid @RequestBody Datos datos) {
-        return servicio.crear(datos.marca().strip(), datos.modelo().strip(), datos.precio());
+        return servicio.crear(
+                datos.marca().strip(), datos.modelo().strip()
+                // , datos.precio() // PRECIO OPCIONAL
+        );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Consola> editar(@PathVariable int id, @Valid @RequestBody Datos datos) {
         return ResponseEntity.of(servicio.editar(
-                id, datos.marca().strip(), datos.modelo().strip(), datos.precio()));
+                id, datos.marca().strip(), datos.modelo().strip()
+                // , datos.precio() // PRECIO OPCIONAL
+        ));
     }
 
     @DeleteMapping("/{id}")
@@ -51,7 +56,7 @@ public class ConsolaController {
 
     public record Datos(
             @NotBlank @Size(max = 80) String marca,
-            @NotBlank @Size(max = 80) String modelo,
-            @NotNull @PositiveOrZero @Digits(integer = 10, fraction = 2) BigDecimal precio
+            @NotBlank @Size(max = 80) String modelo
+            // , @NotNull @PositiveOrZero @Digits(integer = 10, fraction = 2) BigDecimal precio // PRECIO OPCIONAL
     ) {}
 }
