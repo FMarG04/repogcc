@@ -1,55 +1,52 @@
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index').setTitle('Catálogo de consolas');
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle('Consolas')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
-function listarConsolas() {
-  return pedir_('get');
-}
+function consolas(accion, id, datos) {
+  const metodos = new Map([
+    ['listar', 'get'],
+    ['crear', 'post'],
+    ['editar', 'put'],
+    ['eliminar', 'delete']
+  ]);
+  const metodo = metodos.get(accion);
+  if (!metodo) throw new Error('Operación inválida.');
 
-function crearConsola(datos) {
-  return pedir_('post', '', datos);
-}
-
-function editarConsola(id, datos) {
-  return pedir_('put', rutaId_(id), datos);
-}
-
-function eliminarConsola(id) {
-  return pedir_('delete', rutaId_(id));
-}
-
-function rutaId_(id) {
-  if (!Number.isInteger(id) || id < 1 || id > 2147483647) {
-    throw new Error('Identificador de consola inválido.');
+  const requiereId = metodo === 'put' || metodo === 'delete';
+  if (requiereId && (!Number.isInteger(id) || id < 1 || id > 2147483647)) {
+    throw new Error('ID inválido.');
   }
-  return '/' + id;
-}
 
-function pedir_(method, ruta = '', datos) {
-  const config = PropertiesService.getScriptProperties();
-  const base = config.getProperty('API_BASE_URL');
-  const clave = config.getProperty('CONSOLAS_API_KEY');
-  if (!base || !base.startsWith('https://') || !clave) {
-    throw new Error('Configura API_BASE_URL (HTTPS) y CONSOLAS_API_KEY en el proyecto.');
+  const propiedades = PropertiesService.getScriptProperties();
+  const url = propiedades.getProperty('API_BASE_URL');
+  const clave = propiedades.getProperty('CONSOLAS_API_KEY');
+  if (!url || !url.startsWith('https://') || !clave) {
+    throw new Error('Configura la URL HTTPS y la clave en las propiedades del script.');
   }
 
   const opciones = {
-    method,
+    method: metodo,
     headers: { 'X-API-Key': clave },
     muteHttpExceptions: true,
     followRedirects: false
   };
-  if (datos !== undefined) {
+  if (metodo === 'post' || metodo === 'put') {
     opciones.contentType = 'application/json';
     opciones.payload = JSON.stringify(datos);
   }
-  const respuesta = UrlFetchApp.fetch(base.replace(/\/+$/, '') + '/api/consolas' + ruta, opciones);
-  const estado = respuesta.getResponseCode();
-  if (estado === 400) throw new Error('Revisa los campos del formulario.');
-  if (estado === 401) throw new Error('La API rechazó el acceso. Revisa la clave y el puerto de Codespaces.');
-  if (estado === 404) throw new Error('No se encontró la consola o la ruta de la API.');
-  if (estado < 200 || estado >= 300) {
-    throw new Error('La API respondió con HTTP ' + estado + '. Revisa la URL y el Codespace.');
+
+  const ruta = '/api/consolas' + (requiereId ? '/' + id : '');
+  const respuesta = UrlFetchApp.fetch(url.replace(/\/+$/, '') + ruta, opciones);
+  const codigo = respuesta.getResponseCode();
+  if (codigo === 401 || codigo === 403) {
+    throw new Error('Revisa la clave de la API y la visibilidad del puerto 8082.');
   }
-  return estado === 204 ? null : JSON.parse(respuesta.getContentText());
+  if (codigo === 404) throw new Error('La consola o la ruta solicitada no existe.');
+  if (codigo === 400) throw new Error('Revisa la marca y el modelo.');
+  if (codigo < 200 || codigo >= 300) {
+    throw new Error('La API respondió con HTTP ' + codigo + '.');
+  }
+  return codigo === 204 ? null : JSON.parse(respuesta.getContentText());
 }

@@ -1,60 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <base target="_top">
   <style>
-    body { margin: 0; background: #f6f8fb; color: #162338; font: 16px/1.5 system-ui, sans-serif; }
-    main { max-width: 54rem; margin: 2rem auto; padding: 0 1rem; }
-    section { padding: 1rem; background: #fff; border: 1px solid #cbd5e1; border-radius: .5rem; }
-    h2 { margin-top: 0; }
-    .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .75rem; }
+    body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #172b3a; background: #f4f7fa; }
+    main { max-width: 48rem; margin: 2rem auto; padding: 0 1rem; }
+    section { margin-top: 1.25rem; padding: 1rem; border: 1px solid #ccd7df; border-radius: .5rem; background: #fff; }
+    h2 { margin: 0 0 .75rem; }
+    fieldset { margin: 0; padding: 0; border: 0; }
+    .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .75rem; }
     label { display: grid; gap: .25rem; font-weight: 600; }
-    input, button { font: inherit; border: 1px solid #94a3b8; border-radius: .3rem; padding: .45rem .65rem; }
+    input, button { font: inherit; padding: .4rem .65rem; border: 1px solid #8297a9; border-radius: .3rem; }
     input { min-width: 0; }
-    button { cursor: pointer; color: inherit; background: #fff; }
-    button[type="submit"] { background: #1746a2; border-color: #1746a2; color: #fff; }
-    button:disabled { opacity: .6; cursor: wait; }
-    .acciones { margin-top: .8rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+    button { background: #fff; color: inherit; cursor: pointer; }
+    button[type="submit"] { background: #174d8e; color: #fff; border-color: #174d8e; }
+    button:disabled { opacity: .65; cursor: wait; }
+    .botones { margin-top: .75rem; }
     .tabla { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: .5rem; border-bottom: 1px solid #e2e8f0; }
-    td button { margin: .15rem .25rem .15rem 0; }
+    th, td { text-align: left; padding: .5rem; border-bottom: 1px solid #dce4ea; overflow-wrap: anywhere; }
+    td button { margin: .125rem .25rem .125rem 0; }
     #estado { min-height: 1.5em; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Catálogo de consolas</h1>
+    <h1>Consolas</h1>
     <section aria-labelledby="titulo-formulario">
-      <h2 id="titulo-formulario">Nueva consola</h2>
+      <h2 id="titulo-formulario">Registrar consola</h2>
       <form id="formulario">
-        <div class="campos">
-          <label>Marca <input id="marca" required maxlength="80"></label>
-          <label>Modelo <input id="modelo" required maxlength="80"></label>
-          <!-- <label>Precio <input id="precio" required type="number" min="0" max="9999999999.99" step="0.01"></label> --> <!-- PRECIO OPCIONAL -->
-        </div>
-        <div class="acciones">
-          <button id="guardar" type="submit">Agregar</button>
-          <button id="cancelar" type="button" hidden>Cancelar edición</button>
-        </div>
+        <fieldset id="campos">
+          <div class="campos">
+            <label>Marca <input name="marca" required maxlength="80"></label>
+            <label>Modelo <input name="modelo" required maxlength="80"></label>
+          </div>
+          <div class="botones">
+            <button id="guardar" type="submit">Registrar</button>
+            <button id="cancelar" type="button" hidden>Cancelar</button>
+          </div>
+        </fieldset>
       </form>
+      <p id="estado" role="status"></p>
     </section>
-    <p id="estado" role="status" aria-live="polite"></p>
     <section aria-labelledby="titulo-listado">
       <h2 id="titulo-listado">Consolas registradas</h2>
       <div class="tabla">
         <table>
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Marca</th>
-              <th scope="col">Modelo</th>
-              <!-- <th scope="col">Precio</th> --> <!-- PRECIO OPCIONAL -->
-              <th scope="col">Acciones</th>
-            </tr>
-          </thead>
+          <thead><tr><th scope="col">ID</th><th scope="col">Marca</th><th scope="col">Modelo</th><th scope="col">Acciones</th></tr></thead>
           <tbody id="filas"></tbody>
         </table>
       </div>
@@ -62,128 +55,99 @@
   </main>
   <script>
     const formulario = document.getElementById('formulario');
-    const tituloFormulario = document.getElementById('titulo-formulario');
-    const marca = document.getElementById('marca');
-    const modelo = document.getElementById('modelo');
+    const campos = document.getElementById('campos');
+    const titulo = document.getElementById('titulo-formulario');
     const guardar = document.getElementById('guardar');
     const cancelar = document.getElementById('cancelar');
     const estado = document.getElementById('estado');
     const filas = document.getElementById('filas');
-    let editando = null;
-    let ocupado = false;
+    const marca = formulario.elements.namedItem('marca');
+    const modelo = formulario.elements.namedItem('modelo');
+    let idEdicion = null;
 
-    function invocar(accion, ...args) {
+    function llamar(accion, id = null, datos = null) {
       return new Promise((resolver, rechazar) => {
-        const servidor = google.script.run.withSuccessHandler(resolver).withFailureHandler(rechazar);
-        servidor[accion](...args);
+        google.script.run.withSuccessHandler(resolver).withFailureHandler(rechazar)
+          .consolas(accion, id, datos);
       });
     }
 
     async function ejecutar(tarea) {
-      if (ocupado) return;
-      ocupado = true;
-      actualizarBotones();
+      if (campos.disabled) return;
+      campos.disabled = true;
+      filas.querySelectorAll('button').forEach(boton => { boton.disabled = true; });
       estado.textContent = 'Cargando…';
       try {
         estado.textContent = await tarea();
       } catch (error) {
-        estado.textContent = error.message || 'Ocurrió un error al conectar con la API.';
+        estado.textContent = error.message || 'Error al consultar la API.';
       } finally {
-        ocupado = false;
-        actualizarBotones();
+        campos.disabled = false;
+        filas.querySelectorAll('button').forEach(boton => { boton.disabled = false; });
       }
     }
 
-    function actualizarBotones() {
-      for (const boton of document.querySelectorAll('button')) boton.disabled = ocupado;
+    function modoFormulario(consola = null) {
+      idEdicion = consola?.id ?? null;
+      marca.value = consola?.marca ?? '';
+      modelo.value = consola?.modelo ?? '';
+      titulo.textContent = consola ? 'Editar consola' : 'Registrar consola';
+      guardar.textContent = consola ? 'Guardar cambios' : 'Registrar';
+      cancelar.hidden = !consola;
     }
 
-    async function cargar() {
-      const consolas = await invocar('listarConsolas');
+    async function listar() {
+      const consolas = await llamar('listar');
       filas.replaceChildren();
       if (!consolas.length) {
         const celda = filas.insertRow().insertCell();
-        celda.colSpan = document.querySelector('thead tr').cells.length;
+        celda.colSpan = 4;
         celda.textContent = 'Todavía no hay consolas.';
       }
       for (const consola of consolas) {
         const fila = filas.insertRow();
-        const valores = [consola.id, consola.marca, consola.modelo];
-        // valores.push(consola.precio == null ? 'Sin precio' : formatoPrecio.format(consola.precio)); // PRECIO OPCIONAL
-        for (const valor of valores) {
+        for (const valor of [consola.id, consola.marca, consola.modelo]) {
           fila.insertCell().textContent = valor;
         }
         const acciones = fila.insertCell();
         acciones.append(
-          boton('Editar', () => comenzarEdicion(consola)),
+          boton('Editar', () => { modoFormulario(consola); marca.focus(); }),
           boton('Eliminar', () => eliminar(consola))
         );
       }
     }
 
-    function boton(texto, alPulsar) {
+    function boton(texto, accion) {
       const elemento = document.createElement('button');
       elemento.type = 'button';
       elemento.textContent = texto;
-      elemento.addEventListener('click', alPulsar);
+      elemento.addEventListener('click', accion);
       return elemento;
     }
 
-    function comenzarEdicion(consola) {
-      editando = consola.id;
-      marca.value = consola.marca;
-      modelo.value = consola.modelo;
-      // precio.value = consola.precio ?? ''; // PRECIO OPCIONAL
-      tituloFormulario.textContent = 'Editar consola';
-      guardar.textContent = 'Guardar cambios';
-      cancelar.hidden = false;
-      marca.focus();
-    }
-
-    function limpiarFormulario() {
-      editando = null;
-      formulario.reset();
-      tituloFormulario.textContent = 'Nueva consola';
-      guardar.textContent = 'Agregar';
-      cancelar.hidden = true;
-    }
-
     function eliminar(consola) {
-      if (ocupado || !confirm('¿Eliminar ' + consola.marca + ' ' + consola.modelo + '?')) return;
+      if (!confirm('¿Eliminar la consola ' + consola.marca + ' ' + consola.modelo + '?')) return;
       ejecutar(async () => {
-        await invocar('eliminarConsola', consola.id);
-        if (editando === consola.id) limpiarFormulario();
-        await cargar();
+        await llamar('eliminar', consola.id);
+        if (idEdicion === consola.id) modoFormulario();
+        await listar();
         return 'Consola eliminada.';
       });
     }
 
-    formulario.addEventListener('submit', (evento) => {
+    formulario.addEventListener('submit', evento => {
       evento.preventDefault();
       const datos = { marca: marca.value.trim(), modelo: modelo.value.trim() };
-      if (!datos.marca || !datos.modelo) {
-        estado.textContent = 'Completa la marca y el modelo.';
-        return;
-      }
-      // datos.precio = precio.valueAsNumber; // PRECIO OPCIONAL
       ejecutar(async () => {
-        const id = editando;
-        if (id === null) await invocar('crearConsola', datos);
-        else await invocar('editarConsola', id, datos);
-        limpiarFormulario();
-        await cargar();
-        return id === null ? 'Consola agregada.' : 'Cambios guardados.';
+        const accion = idEdicion === null ? 'crear' : 'editar';
+        await llamar(accion, idEdicion, datos);
+        modoFormulario();
+        await listar();
+        return accion === 'crear' ? 'Consola registrada.' : 'Cambios guardados.';
       });
     });
-    cancelar.addEventListener('click', limpiarFormulario);
-
-    // const precio = document.getElementById('precio'); // PRECIO OPCIONAL
-    // const formatoPrecio = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); // PRECIO OPCIONAL
-
-    ejecutar(async () => {
-      await cargar();
-      return '';
-    });
+    cancelar.addEventListener('click', () => modoFormulario());
+    ejecutar(async () => { await listar(); return ''; });
   </script>
 </body>
 </html>
